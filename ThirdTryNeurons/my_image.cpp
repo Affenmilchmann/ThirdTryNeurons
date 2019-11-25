@@ -6,12 +6,12 @@ my_image::~my_image() { }
 
 //-----------------------
 
-void my_image::load_image(std::string file_path)
+void my_image::load_image(std::string file_path) // loading img using "SFML"
 {
 	std::ifstream exist_test;
 	exist_test.open(file_path);
 
-	if (!exist_test) is_image_loaded = false;
+	if (!exist_test) is_image_loaded = false; //file existance check
 	else
 	{
 		is_image_loaded = true;
@@ -22,14 +22,14 @@ void my_image::load_image(std::string file_path)
 
 		for (int i = 0; i < img.getSize().x; i++)
 			for (int j = 0; j < img.getSize().y; j++)
-				if (img.getPixel(i, j).r > 100) values_array[i * PICTURE_SIZE + j] = 0;
+				if (img.getPixel(i, j).r > 100) values_array[i * PICTURE_SIZE + j] = 0; // black = 1 white = 0
 				else							values_array[i * PICTURE_SIZE + j] = 1;
 	}
 
 	exist_test.close();
 }
 
-int* my_image::get_array()
+int* my_image::get_array() // return 1 and 0
 {
 	return values_array;
 }

@@ -14,35 +14,35 @@ network::~network() {}
 
 //-------------------------------
 
-void network::teach() // главная функция для обучения
+void network::teach() // main teaching func
 {
-	std::vector<fs::path>* retu = new std::vector<fs::path>[OUTPUT_NEURONS]; // вектор для хранения имен всех файлов. Ест много памяти
+	std::vector<fs::path>* retu = new std::vector<fs::path>[OUTPUT_NEURONS]; // vector that keeps all names of all training pics
 	my_image img;
-	int* input_image_array; // массив из 1 и 0, черный и белый соотвественно
-	int* correct_answers = new int[OUTPUT_NEURONS]; // массив из 1 и 0, где одна единица на верном ответе
+	int* input_image_array; // array with 1 and 0. black and white
+	int* correct_answers = new int[OUTPUT_NEURONS]; // array with correct answers one 1 and 25 0
 	//int iter_count = 0;
 
-	for (int chr = 0; chr < OUTPUT_NEURONS; chr++) // получаем все файлы из папок с помощью библиотеки BOOST
+	for (int chr = 0; chr < OUTPUT_NEURONS; chr++) // getting all files with "BOOST" lib
 	{
-		get_all("lesson/" + get_string((char)(chr + (int)'A')), ".png", retu[chr]); //смотрим все файлы в папке и записываем в retu
+		get_all("lesson/" + get_string((char)(chr + (int)'A')), ".png", retu[chr]); //recording all files to retu
 		//iter_count += retu[chr].size();
 	}
 
-	for (int img_num = 0; img_num < 1000; img_num++) // проходим по каждой буквеfor (int img_num = 0; img_num < /*retu.size()*/100; img_num++)
+	for (int img_num = 0; img_num < 1000; img_num++) // 1000 - amount of training files of each letter
 	{
 		std::cout << img_num << "/" << 1000 << "\n"; 
 
 		for (int chr = 0; chr < OUTPUT_NEURONS; chr++)
 		{
-			img.load_image("lesson/" + get_string((char)(chr + (int)'A')) + "/" + retu[chr][img_num].string()); //загружаем каритнку из файла
+			img.load_image("lesson/" + get_string((char)(chr + (int)'A')) + "/" + retu[chr][img_num].string()); //loading pic from file
 			if (img.is_image_loaded)
 			{
-				input_image_array = img.get_array(); // заполняем 1 и 0
+				input_image_array = img.get_array(); // filling 1 и 0 black and white
 
-				for (int i = 0; i < OUTPUT_NEURONS; i++) correct_answers[i] = 0; // заполняем 1 и 0 верный ответ
+				for (int i = 0; i < OUTPUT_NEURONS; i++) correct_answers[i] = 0; // filling 1 и 0 correct answers
 				correct_answers[chr] = 1;
 
-				output_layer.teach(correct_answers, input_image_array); // учим слой
+				output_layer.teach(correct_answers, input_image_array); // teaching the layer
 
 				delete[] input_image_array; 
 			}
@@ -55,15 +55,15 @@ void network::teach() // главная функция для обучения
 	for (int chr = 0; chr < OUTPUT_NEURONS; chr++)
 		retu[chr].clear();
 
-	save_to_file(SAVE_PATH); // сохранение файла с весами
+	save_to_file(SAVE_PATH); // saving weights to file
 	//img.load_image("lesson/A/" + retu[0].string());
 	//output_layer.teach(correct_answers, input_values);
 }
 
-void network::guess(std::string file_path) // просто считает ответ сети
+void network::guess(std::string file_path) // gives answer from pic
 {
 	std::ifstream input_stream;
-	input_stream.open(file_path);// тут проверка на существование файла 
+	input_stream.open(file_path);// file existance check
 
 	if (!input_stream)
 	{
@@ -76,7 +76,7 @@ void network::guess(std::string file_path) // просто считает ответ сети
 		my_image temp_img;
 		temp_img.load_image(file_path);
 
-		double* answers = output_layer.give_answer(temp_img.get_array()); // а тут вывод ответов
+		double* answers = output_layer.give_answer(temp_img.get_array()); // answers output to cmd
 		for (int i = 0; i < OUTPUT_NEURONS; i++)
 		{
 			std::cout << (char)(i + (int)'A') << " is " << answers[i] << "\n";
@@ -84,12 +84,12 @@ void network::guess(std::string file_path) // просто считает ответ сети
 	}
 }
 
-void network::save_to_file(std::string file_path) // сохранение а файл весов
+void network::save_to_file(std::string file_path) // saving weights
 {
 	double** output_data = output_layer.weights();
 
 	std::ofstream output_stream;
-	output_stream.open(file_path); // проверка на существование
+	output_stream.open(file_path); // file existance check
 
 	if (!output_stream)
 	{
@@ -101,7 +101,7 @@ void network::save_to_file(std::string file_path) // сохранение а файл весов
 	for (int neu = 0; neu < OUTPUT_NEURONS; neu++)
 	{
 		output_stream << neu << "\n";
-		for (int wght = 0; wght < PICTURE_SIZE * PICTURE_SIZE + 1; wght++) // запись
+		for (int wght = 0; wght < PICTURE_SIZE * PICTURE_SIZE + 1; wght++) // recording
 		{
 			output_stream << output_data[neu][wght] << " ";
 		}
@@ -110,10 +110,10 @@ void network::save_to_file(std::string file_path) // сохранение а файл весов
 	std::cout << "File have been saved. \n";
 }
 
-void network::load_from_file(std::string file_path) // загрузка из файла
+void network::load_from_file(std::string file_path) // loading 
 {
 	std::ifstream input_stream;
-	input_stream.open(file_path); // проверка на существование
+	input_stream.open(file_path); // file existance check
 
 	if (!input_stream)
 	{
@@ -123,7 +123,7 @@ void network::load_from_file(std::string file_path) // загрузка из файла
 	}
 	else
 	{
-		double** weights_temp = new double*[OUTPUT_NEURONS]; // ну, загрузка
+		double** weights_temp = new double*[OUTPUT_NEURONS];
 		double temp;
 		for (int i = 0; i < OUTPUT_NEURONS; i++)
 		{
@@ -148,9 +148,9 @@ void network::load_from_file(std::string file_path) // загрузка из файла
 
 // return the filenames of all files that have the specified extension
 // in the specified directory and all subdirectories
-void get_all(const fs::path& root, const std::string& ext, std::vector<fs::path>& ret) // скопировал из интернета. Не понимаю, как она работает
+void get_all(const fs::path& root, const std::string& ext, std::vector<fs::path>& ret) // i took it from stackoverflow. idk how it works
 {
-	if (!fs::exists(root) || !fs::is_directory(root)) return; // она получает все файлы из папки
+	if (!fs::exists(root) || !fs::is_directory(root)) return; // it gets all files from folder
 
 	fs::recursive_directory_iterator it(root);
 	fs::recursive_directory_iterator endit;

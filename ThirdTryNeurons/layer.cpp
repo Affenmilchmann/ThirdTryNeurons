@@ -9,14 +9,14 @@ layer::layer(int neurons_amount, int inputs_amount)
 	for (int i = 0; i < neurons_amount; i++) neurons[i] = neuron(inputs_amount);
 }
 
-void layer::teach(int* correct_answers, int* input_values) // обучение каждого нейрона
+void layer::teach(int* correct_answers, int* input_values) // teaching each layer
 {
 	for (int i = 0; i < OUTPUT_NEURONS; i++)
 	{
 		neurons[i].teach(correct_answers[i], input_values);
 
 		double avrg = 0;
-		for (int i = 0; i < 26; i++) avrg += neurons[i].get_w0(); // костыль, я не разобрался, как регулировать веса сдивга. Тут я их усредняю
+		for (int i = 0; i < 26; i++) avrg += neurons[i].get_w0(); // "kostyl" making all w0 equals to avoid all answers 1 or 0
 
 		avrg /= 26;
 
@@ -25,7 +25,7 @@ void layer::teach(int* correct_answers, int* input_values) // обучение каждого н
 	//neurons[correct_answers].teach(1.0f, input_values);
 }
 
-double** layer::weights() // возвращает все веса
+double** layer::weights() // returns all weights
 {
 	double** output = new double*[OUTPUT_NEURONS];
 
@@ -37,7 +37,7 @@ double** layer::weights() // возвращает все веса
 	return output;
 }
 
-double* layer::give_answer(int* input_values) // ответ сети
+double* layer::give_answer(int* input_values) // net answer
 {
 	double* output = new double[OUTPUT_NEURONS];
 
@@ -46,7 +46,7 @@ double* layer::give_answer(int* input_values) // ответ сети
 	return output;
 }
 
-void layer::set_weights(double** weights) // задать веса
+void layer::set_weights(double** weights) 
 {
 	for (int i = 0; i < OUTPUT_NEURONS; i++) neurons[i].set_weights(weights[i]);
 }
